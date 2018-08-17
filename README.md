@@ -13,7 +13,7 @@ When all info is correct this could be set up as an email alert service.
 ## About: API
 API documentation : [apis.is](http://docs.apis.is/#endpoint-weather), [github](https://github.com/apis-is/apis/blob/master/endpoints/weather/documentation.md)
 
-The forecasts that are queried are generally given out 
+The forecasts that are queried are generally given out at 06:00, 12:00, 15:00 but they are not published at the time of forecast. (Still waiting on an answer from vedurstofa on that issue)
 
 ## About: Weather directions
 
