@@ -8,7 +8,7 @@ When all info is correct this could be set up as an email alert service.
 * python3
 * pip install -r requirements.txt
 
-
+[See here how to setup and start a Jupyter notebook](https://jupyter.readthedocs.io/en/latest/install.html)
 
 ## About: API
 The KiteUp program queries the /weather/forecasts endpoint of apis.is, [that code ](https://github.com/apis-is/apis/blob/master/endpoints/weather/index.js) queries various endpoints of vedur.is 
