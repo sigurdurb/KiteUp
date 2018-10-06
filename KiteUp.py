@@ -98,8 +98,9 @@ my_settings = {
     }
 }
 
-with open("settings.json", 'w', encoding='latin-1') as f:
-    json.dump(my_settings, f, ensure_ascii=False, indent=4, sort_keys=True) 
+def save_settings(my_settings):  
+    with open("settings.json", 'w', encoding='latin-1') as f:
+        json.dump(my_settings, f, ensure_ascii=False, indent=4, sort_keys=True) 
 
 
 # In[4]:
@@ -256,7 +257,6 @@ def main(k):
     if alert:
         try:
             send_mail("\n".join(alert), k.email)
-            print("Email/s sent")
         except NameError as e:
             print("Not sending email")
 
