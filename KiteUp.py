@@ -94,7 +94,7 @@ my_settings = {
             'check_days': check_days,
             'include_directions': include_directions,
             'min_rows': min_rows,
-            'email': 'siggibald4@gmail.com',
+            'email': 'example@blamail.com',
     }
 }
 
