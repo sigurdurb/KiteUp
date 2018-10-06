@@ -15,6 +15,9 @@ When all info is correct this could be set up as an email alert service.
 Anyone can make a pull request.
 
 If you want to make something into modules that would also be cool.
+
+A basic Xamarin app with notifications would also be a cool contribution.
+
 ### Before adding also generate a .py file from the notebook
 `jupyter nbconvert --to python KiteUp.ipynb`
 
