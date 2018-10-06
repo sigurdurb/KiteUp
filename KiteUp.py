@@ -13,11 +13,11 @@ import os
 
 # # KiteUp - Icelandic weather alert system for kitesurfers
 
-# In[2]:
+# In[80]:
 
 
 
-'''Constants
+'''CONSTANTS
 Weather Station Id's'''
 REY = 1 # Reykjavík : Grótta
 EYR = 1395 # Eyrarbakki : Ölfurárós
@@ -29,6 +29,9 @@ TIDE Station Id's
 ''' 
 REY_TIDE = 23 # Reykjavík
 TLH_TIDE = 25 # Þorlákshöfn
+
+'''END OF CONTANTS'''
+
 
 '''Configure your variables:
 hour_range - Hour range, compared with <= and >=
@@ -48,7 +51,7 @@ wind_range = [6,12]
 do_not_want = ['rign','skúr'] # Leave empty if you want any kind of weather condition
 
 
-check_days = 3 # How many days ahead to check, including today, highest is 5
+check_days = 2 # How many days ahead to check, including today, highest is 5
 
 include_directions = True # if to include the directions for the spots given below
 min_rows = 2 # Setting min rows as 2 because some forecasts only predict for every 3 hours
@@ -73,13 +76,13 @@ locations = {
             }
 
 
-# In[3]:
+# In[81]:
 
 
 # WRITE YOUR CUSTOM SETTINGS TO A JSON FILE
 
 my_settings = {
-    'sigurdb': {
+    'yourname': {
             'locations': locations,
             'hour_range': hour_range,
             'wind_range': wind_range,
@@ -95,7 +98,7 @@ with open("settings.json", 'w', encoding='latin-1') as f:
     json.dump(my_settings, f, ensure_ascii=False, indent=4, sort_keys=True) 
 
 
-# In[4]:
+# In[82]:
 
 
 class kiter:
@@ -106,7 +109,7 @@ class kiter:
             self.__setattr__(attribute, value)
 
 
-# In[5]:
+# In[83]:
 
 
 def query_weather_api(locations):
@@ -128,7 +131,7 @@ def query_weather_api(locations):
             D - vindstefnu'''
 
 
-# In[6]:
+# In[84]:
 
 
 def query_tides_api(location_id, day):
@@ -148,7 +151,7 @@ def clean_tides_df(df):
     return df
 
 
-# In[7]:
+# In[85]:
 
 
 def wind_filter(df, wind_range):
@@ -172,7 +175,7 @@ def tides_filter(df, min_height):
     
 
 
-# In[8]:
+# In[86]:
 
 
 def run_filters(df, k, direction_tide, day):
@@ -210,7 +213,7 @@ def day_check(df, k, location_id, link, utgafutimi, day):
             
 
 
-# In[9]:
+# In[87]:
 
 
 def main(k):
@@ -241,9 +244,10 @@ def main(k):
             day_check(df_day, k, location_id, link, utgafutimi, day)
             # Iterate to the next day
             day += pd.DateOffset(days=1)
+            
 
 
-# In[11]:
+# In[88]:
 
 
 if __name__ == '__main__':
@@ -252,7 +256,6 @@ if __name__ == '__main__':
         with open(filename, 'r', encoding='latin-1') as f:
             settings = json.load(f)
     for name,v in settings.items():
-        print()
         k = kiter(v)
         # Run the program for every different kiter settings
         main(k)
