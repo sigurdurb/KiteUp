@@ -9,11 +9,15 @@ import datetime as dt
 import pandas as pd
 import json
 import os
+try:
+    from emailer import send_mail
+except ModuleNotFoundError as e:
+    print("Running without email")
 
 
 # # KiteUp - Icelandic weather alert system for kitesurfers
 
-# In[80]:
+# In[2]:
 
 
 
@@ -76,7 +80,7 @@ locations = {
             }
 
 
-# In[81]:
+# In[3]:
 
 
 # WRITE YOUR CUSTOM SETTINGS TO A JSON FILE
@@ -90,7 +94,7 @@ my_settings = {
             'check_days': check_days,
             'include_directions': include_directions,
             'min_rows': min_rows,
-            'email': 'example@blamail.com',
+            'email': 'siggibald4@gmail.com',
     }
 }
 
@@ -98,7 +102,7 @@ with open("settings.json", 'w', encoding='latin-1') as f:
     json.dump(my_settings, f, ensure_ascii=False, indent=4, sort_keys=True) 
 
 
-# In[82]:
+# In[4]:
 
 
 class kiter:
@@ -109,7 +113,7 @@ class kiter:
             self.__setattr__(attribute, value)
 
 
-# In[83]:
+# In[5]:
 
 
 def query_weather_api(locations):
@@ -131,7 +135,7 @@ def query_weather_api(locations):
             D - vindstefnu'''
 
 
-# In[84]:
+# In[6]:
 
 
 def query_tides_api(location_id, day):
@@ -151,7 +155,7 @@ def clean_tides_df(df):
     return df
 
 
-# In[85]:
+# In[7]:
 
 
 def wind_filter(df, wind_range):
@@ -175,7 +179,7 @@ def tides_filter(df, min_height):
     
 
 
-# In[86]:
+# In[30]:
 
 
 def run_filters(df, k, direction_tide, day):
@@ -199,28 +203,28 @@ Parameters:
 df – df containing weather for one day
 location_id - weather station id '''
 def day_check(df, k, location_id, link, utgafutimi, day):
+    message = ""
     for spot in k.locations[str(location_id)]:
         clean_df = df.copy() # For all the spots we need a fresh copy from here
         for name, direction_tide in spot.items():
             df = run_filters(df, k, direction_tide, day)
             if df.shape[0] >= min_rows:
-                print(spot)
-                print("Spá gefin út: " + utgafutimi)
-                print(link)
-                print(df.head())
+                df = df.reset_index(drop=True)
+                message += "{}\n{}\nStart: {}\n{}\n".format(spot,link,df.loc[0,'ftime'],df.to_string(justify='justify-all', col_space=5))
+                
             df = clean_df.copy()
-            
+    return message        
             
 
 
-# In[87]:
+# In[31]:
 
 
 def main(k):
     
     response_weather = query_weather_api(k.locations)
     vedur = response_weather.json()['results']
-    
+    alert = list()
     for i in range(len(vedur)):
         location_id = int(vedur[i]['id'])
         link = vedur[i]['link']
@@ -241,13 +245,23 @@ def main(k):
         for i in range(0, check_days):
             df_day = df[df.ftime.dt.day == day.day]
             # Call day_check with a dataframe for each day
-            day_check(df_day, k, location_id, link, utgafutimi, day)
+            message = day_check(df_day, k, location_id, link, utgafutimi, day)
+            if message:
+                message = "Spá gefin út: " + utgafutimi + '\n' + message
+                alert.append(message)
             # Iterate to the next day
             day += pd.DateOffset(days=1)
-            
+    
+    print("\n".join(alert))
+    if alert:
+        try:
+            send_mail("\n".join(alert), k.email)
+            print("Email/s sent")
+        except NameError as e:
+            print("Not sending email")
 
 
-# In[88]:
+# In[32]:
 
 
 if __name__ == '__main__':
