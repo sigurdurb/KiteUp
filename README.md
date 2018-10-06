@@ -4,13 +4,14 @@ Jupyter Notebook that queries Icelandic weather stations for kite–able locatio
 
 When all info is correct this could be set up as an email alert service.
 
+
 ## Setup
 * python3
 * pip install -r requirements.txt
 
 [See here how to setup and start a Jupyter notebook](https://jupyter.readthedocs.io/en/latest/install.html)
 
-## About: API
+## About:API
 The KiteUp program queries the /weather/forecasts endpoint of apis.is, [that code ](https://github.com/apis-is/apis/blob/master/endpoints/weather/index.js) queries various endpoints of vedur.is 
 
 Apis.is API documentation endpoint: [apis.is](http://docs.apis.is/#endpoint-weather), [github](https://github.com/apis-is/apis/blob/master/endpoints/weather/documentation.md)
@@ -58,3 +59,16 @@ According to support forecast updates are written into their database at the sam
 
 
 Heimild: [http://www.vedur.is/vedur/frodleikur/greinar/nr/936](http://www.vedur.is/vedur/frodleikur/greinar/nr/936)
+
+
+
+## Tides
+
+KiteUp reads from the html tables served at /vs/Stationsdetails.aspx of [www.vegagerdin.is](http://www.vegagerdin.is)
+
+For example: [http://www.vegagerdin.is/vs/Stationsdetails.aspx?ID=25&Per=24&Dt=201810060000&nohead=true](http://www.vegagerdin.is/vs/Stationsdetails.aspx?ID=25&Per=24&Dt=201810060000&nohead=true)
+
+They give out sea level height in meters.
+
+
+
