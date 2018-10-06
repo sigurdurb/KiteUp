@@ -180,7 +180,7 @@ def tides_filter(df, min_height):
     
 
 
-# In[30]:
+# In[33]:
 
 
 def run_filters(df, k, direction_tide, day):
@@ -211,14 +211,14 @@ def day_check(df, k, location_id, link, utgafutimi, day):
             df = run_filters(df, k, direction_tide, day)
             if df.shape[0] >= min_rows:
                 df = df.reset_index(drop=True)
-                message += "{}\n{}\nStart: {}\n{}\n".format(spot,link,df.loc[0,'ftime'],df.to_string(justify='justify-all', col_space=5))
+                message += "{}\n{}\nStart: {}\n{}\n".format(spot,link,df.loc[0,'ftime'],df.to_string(justify='left', col_space=5))
                 
             df = clean_df.copy()
     return message        
             
 
 
-# In[31]:
+# In[34]:
 
 
 def main(k):
@@ -261,7 +261,7 @@ def main(k):
             print("Not sending email")
 
 
-# In[32]:
+# In[37]:
 
 
 if __name__ == '__main__':
