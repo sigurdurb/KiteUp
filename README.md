@@ -12,7 +12,10 @@ When all info is correct this could be set up as an email alert service.
 [See here how to setup and start a Jupyter notebook](https://jupyter.readthedocs.io/en/latest/install.html)
 
 ## Contributing
-### Before adding generate a .py file from the notebook
+Anyone can make a pull request.
+
+If you want to make something into modules that would also be cool.
+### Before adding also generate a .py file from the notebook
 `jupyter nbconvert --to python KiteUp.ipynb`
 
 Then you can also run it as a normal python script:

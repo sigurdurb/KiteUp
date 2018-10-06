@@ -1,17 +1,19 @@
 
 # coding: utf-8
 
-# In[48]:
+# In[1]:
 
 
 import requests as r
 import datetime as dt
 import pandas as pd
+import json
+import os
 
 
 # # KiteUp - Icelandic weather alert system for kitesurfers
 
-# In[49]:
+# In[2]:
 
 
 
@@ -71,7 +73,40 @@ locations = {
             }
 
 
-# In[50]:
+# In[3]:
+
+
+# WRITE YOUR CUSTOM SETTINGS TO A JSON FILE
+
+my_settings = {
+    'sigurdb': {
+            'locations': locations,
+            'hour_range': hour_range,
+            'wind_range': wind_range,
+            'do_not_want': do_not_want,
+            'check_days': check_days,
+            'include_directions': include_directions,
+            'min_rows': min_rows,
+            'email': 'example@blamail.com',
+    }
+}
+
+with open("settings.json", 'w', encoding='latin-1') as f:
+    json.dump(my_settings, f, ensure_ascii=False, indent=4, sort_keys=True) 
+
+
+# In[4]:
+
+
+class kiter:
+    def __init__(self, attributes):
+        if type(attributes) == str:
+            attributes =  json.loads(attributes)
+        for attribute, value in attributes.items():
+            self.__setattr__(attribute, value)
+
+
+# In[5]:
 
 
 def query_weather_api(locations):
@@ -93,7 +128,7 @@ def query_weather_api(locations):
             D - vindstefnu'''
 
 
-# In[51]:
+# In[6]:
 
 
 def query_tides_api(location_id, day):
@@ -106,14 +141,14 @@ def query_tides_api(location_id, day):
 
 def clean_tides_df(df):
     df.columns = df.iloc[0,:].values
-    df = df.iloc[1:,:].reset_index(drop=True) #'6.10.2018 19:00'
-    df['Tími'] = pd.to_datetime(df['Tími'],format='%d.%m.%Y %H:%M')
+    df = df.iloc[1:,:].reset_index(drop=True) 
+    df['Tími'] = pd.to_datetime(df['Tími'],format='%d.%m.%Y %H:%M') # example format we get from vegagerdin: '6.10.2018 19:00'
     df['Sjávarhæð [m]'] = pd.to_numeric(df['Sjávarhæð [m]'])
     df.rename(columns={'Tími':'ftime'}, inplace=True)
     return df
 
 
-# In[52]:
+# In[7]:
 
 
 def wind_filter(df, wind_range):
@@ -137,20 +172,19 @@ def tides_filter(df, min_height):
     
 
 
-# In[53]:
+# In[8]:
 
 
-
-def run_filters(df, direction_tide, day):
-    df = wind_filter(df, wind_range)
-    df = rain_filter(df, do_not_want)
+def run_filters(df, k, direction_tide, day):
+    df = wind_filter(df, k.wind_range)
+    df = rain_filter(df, k.do_not_want)
 
     if not df.empty:
-        if include_directions:
+        if include_directions: # Wind directions
             df = directions_filter(df, direction_tide[0])
-        # If we get through all this we query for the tides sea stations for day variable
-        if direction_tide[1]: # If the list is not empty, such as with Skógtjörn
-            df_tides = clean_tides_df(query_tides_api(direction_tide[1][0], day - pd.DateOffset(hour=0))) # Always reset the hour to 00:00
+        # Query for the tides sea stations for day interval for the next 24hours
+        if direction_tide[1]: # If the list is not empty, such as with Skógtjörn, We only go here where it is needed or we want to merge the datasets for display purposes
+            df_tides = clean_tides_df(query_tides_api(direction_tide[1][0], day - pd.DateOffset(hour=0))) # Always reset the hour to 00:00, to get the next 24 hours
             df = pd.merge(left=df, right=df_tides, on='ftime', how='inner')
             df = tides_filter(df, direction_tide[1][1])
     return df
@@ -161,11 +195,11 @@ Filters out if the forecast of the day has the right wind and kite–able direct
 Parameters:
 df – df containing weather for one day
 location_id - weather station id '''
-def day_check(df, location_id, link, utgafutimi, day):
-    for spot in locations[location_id]:
+def day_check(df, k, location_id, link, utgafutimi, day):
+    for spot in k.locations[str(location_id)]:
         clean_df = df.copy() # For all the spots we need a fresh copy from here
         for name, direction_tide in spot.items():
-            df = run_filters(df, direction_tide, day)
+            df = run_filters(df, k, direction_tide, day)
             if df.shape[0] >= min_rows:
                 print(spot)
                 print("Spá gefin út: " + utgafutimi)
@@ -174,16 +208,14 @@ def day_check(df, location_id, link, utgafutimi, day):
             df = clean_df.copy()
             
             
-            
-            
 
 
-# In[54]:
+# In[9]:
 
 
-def main():
+def main(k):
     
-    response_weather = query_weather_api(locations)
+    response_weather = query_weather_api(k.locations)
     vedur = response_weather.json()['results']
     
     for i in range(len(vedur)):
@@ -198,7 +230,7 @@ def main():
         # Set the index to a DateTimeIndex so we can filter by hour
         df.set_index(pd.DatetimeIndex(df['ftime']), inplace=True)
         df.index.names=['index']
-        df = hour_range_filter(df, hour_range)
+        df = hour_range_filter(df, k.hour_range)
         
         # Get the first date
         day = df['ftime'].iloc[0]
@@ -206,14 +238,22 @@ def main():
         for i in range(0, check_days):
             df_day = df[df.ftime.dt.day == day.day]
             # Call day_check with a dataframe for each day
-            day_check(df_day, location_id, link, utgafutimi, day)
+            day_check(df_day, k, location_id, link, utgafutimi, day)
             # Iterate to the next day
             day += pd.DateOffset(days=1)
 
 
-# In[55]:
+# In[11]:
 
 
 if __name__ == '__main__':
-    main()
+    filename = "settings.json"
+    if os.path.exists(filename):
+        with open(filename, 'r', encoding='latin-1') as f:
+            settings = json.load(f)
+    for name,v in settings.items():
+        print()
+        k = kiter(v)
+        # Run the program for every different kiter settings
+        main(k)
 
