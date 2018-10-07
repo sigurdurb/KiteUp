@@ -256,7 +256,7 @@ def main(k):
     print("\n".join(alert))
     if alert:
         try:
-            send_mail("\n".join(alert), k.email)
+            send_mail("\n".join(alert), [k.email])
         except NameError as e:
             print("Not sending email")
 
