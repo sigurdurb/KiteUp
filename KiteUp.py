@@ -27,6 +27,7 @@ REY = 1 # Reykjavík : Grótta
 EYR = 1395 # Eyrarbakki : Ölfurárós
 GEL = 1480 # Geldingarnes : Geldingarnes
 STR = 1473 # Straumsvík : Skógtjörn, Grótta
+TYK = 6208 # Þykkvibær
 
 '''
 TIDE Station Id's
@@ -67,17 +68,21 @@ min_rows = 2 # Setting min rows as 2 because some forecasts only predict for eve
 GROTTA = {'Grótta':[['N','NNA','NV','NNV','VNV','V','VSV','SV'],[REY_TIDE, 2]]}
 SKOGTJ = {'Skógtjörn':[['S','SA','SSA','SV','SSV','VSV'],[]]}
 GELNES = {'Geldingarnes':[['A','ASA','SSA','SA','V','VNV'],[REY_TIDE, 0]]}
-OLFUS = {'Ölfusárlón':[['A','ASA','SSA','S','SA','SSV','VSV','VNV','V'],[TLH_TIDE, 1.5]]}
+OLFUS = {'Ölfusárlón':[['N','NA','NNA','NNV','S','SSA','SSV','SV','SA','V','VNV','VSV','A','ANA','ASA'],[TLH_TIDE, 1]]}
+THOR = {'Thorlakshofn':[['A','ASA','SSA','S','SA','SSV','VSV','VNV','V'],[TLH_TIDE, 0.5]]}
+THYK = {'Tykkvibær':[['A','ASA','SA','SSA','NV','NNV','V','VNV','VSV'],[TLH_TIDE, 0]]}
 
 
 # Weather stations can have many spots
 locations = {
                 REY:[GROTTA],
-                EYR:[OLFUS],
+                EYR:[OLFUS, THOR],
+                TYK:[THYK],
                 GEL:[GELNES],
                 STR:[SKOGTJ, 
                     GROTTA]
             }
+
 
 
 # In[3]:
